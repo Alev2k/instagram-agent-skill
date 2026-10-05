@@ -36,14 +36,17 @@ import re
 import statistics
 import sys
 
-WORD_RE = re.compile(r"[A-Za-z0-9$%'’-]+")
+# Accented letters are part of the word: "você", "não", "Jericoacoara".
+WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ0-9$%'’-]+")
 NUMBER_RE = re.compile(
-    r"\$\s?\d[\d,]*(?:\.\d+)?"                       # money, whole
+    r"(?:\$|R\$)\s?\d[\d,.]*"                        # money, whole
     r"|\b\d[\d,]*(?:\.\d+)?\s?"                      # a figure, with or
     r"(?:%|k\b|x\b|hrs?\b|hours?\b|mins?\b|minutes?\b"  # without a unit
-    r"|days?\b|weeks?\b|months?\b|years?\b)?",
+    r"|days?\b|weeks?\b|months?\b|years?\b"
+    r"|h\b|horas?\b|minutos?\b|dias?\b|semanas?\b|meses\b|mês\b|anos?\b"
+    r"|km\b|reais\b|mil\b)?",
     re.IGNORECASE)
-PROPER_RE = re.compile(r"(?<!^)\b[A-Z][a-z]{2,}\b")
+PROPER_RE = re.compile(r"(?<!^)\b[A-ZÀ-ÖØ-Þ][a-zß-öø-ÿ]{2,}\b")
 HASHTAG_RE = re.compile(r"(?:^|\s)#\w+")
 EMOJI_RE = re.compile(r"[\U0001F300-\U0001FAFF☀-➿]")
 
@@ -56,10 +59,18 @@ SPOKEN_NUMBERS = {
     "ten", "eleven", "twelve", "fifteen", "twenty", "thirty", "forty", "fifty",
     "sixty", "seventy", "eighty", "ninety", "hundred", "thousand", "million",
     "billion", "dozen", "half", "twice", "triple",
+    # pt-BR. "um/uma" and "primeiro" left out for the same reason as "one".
+    "dois", "duas", "três", "tres", "quatro", "cinco", "seis", "sete", "oito",
+    "nove", "dez", "onze", "doze", "quinze", "vinte", "trinta", "quarenta",
+    "cinquenta", "cem", "cento", "duzentos", "trezentos", "quinhentos", "mil",
+    "milhão", "milhões", "bilhão", "dúzia", "meia", "metade", "dobro", "triplo",
 }
 MONEY_WORDS = {
     "dollars", "dollar", "bucks", "grand", "percent", "cents",
     "millionaire", "billionaire", "revenue", "profit", "salary", "rent",
+    "reais", "real", "conto", "contos", "pila", "centavos", "porcento",
+    "grátis", "gratis", "desconto", "promoção", "cortesia", "preço", "salário",
+    "aluguel", "lucro", "faturamento",
 }
 
 # Words that put something on the line. A hook with none of these is a
@@ -76,6 +87,17 @@ STAKES = {
     "before", "until", "instead", "but", "except", "unless", "problem",
     "risk", "danger", "warning", "regret", "wish", "should", "shouldn't",
     "still", "already", "only", "without", "versus", "vs", "actually",
+    # pt-BR
+    "pare", "nunca", "errado", "errada", "erro", "erros", "perdi",
+    "perder", "perdeu", "perdendo", "custa", "custou", "quebrou", "falhou",
+    "ninguém", "ninguem", "não", "nao", "nem", "jamais", "parei", "largou",
+    "demitido", "cortei", "economizei", "economiza", "pagou", "paguei",
+    "proibido", "pior", "piores", "odeio", "desperdício", "desperdiçou",
+    "golpe", "mentira", "verdade", "segredo", "escondido", "antes", "até",
+    "ate", "mas", "porém", "exceto", "menos", "problema", "risco", "perigo",
+    "cuidado", "arrependo", "arrependimento", "deveria", "ainda", "já",
+    "só", "sem", "contra", "realmente", "madrugar", "madrugada", "fila",
+    "caro", "barato", "sabia",
 }
 
 # Openers that spend the first second saying nothing.
@@ -86,6 +108,13 @@ WEAK_OPENERS = [
     "have you", "did you", "do you", "are you", "in this", "in today",
     "the thing", "a lot", "there is", "there are", "this is", "it is",
     "as a", "when it", "if you've", "you know",
+    # pt-BR
+    "e aí", "e ai", "eai", "oi", "olá", "ola", "fala", "salve", "bom dia",
+    "boa tarde", "boa noite", "gente", "galera", "pessoal", "turminha",
+    "meu povo", "hoje", "então", "entao", "bom", "bem", "tipo", "olha",
+    "aqui é", "aqui e", "eu sou", "sou o", "sou a", "eu vou", "vou te",
+    "vou mostrar", "neste", "nesse", "esse é", "essa é", "isso é", "este é",
+    "existe", "tem um", "tem uma", "quem nunca", "seja bem",
 ]
 
 # Imperatives that earn the front position.
@@ -93,6 +122,11 @@ IMPERATIVES = {
     "stop", "steal", "copy", "delete", "try", "watch", "read", "save",
     "use", "build", "make", "write", "send", "take", "start", "quit",
     "never", "always", "don't", "dont", "do", "put", "run", "check",
+    # pt-BR
+    "pare", "para", "copia", "copie", "salva", "salve", "apaga", "tenta",
+    "tente", "faz", "faça", "faca", "usa", "use", "evita", "evite", "nunca",
+    "sempre", "não", "nao", "esquece", "esqueça", "reserva", "reserve",
+    "vem", "venha", "vai", "corre", "marca", "manda", "escolha", "troca",
 }
 
 DEALBREAKERS = [
@@ -102,6 +136,14 @@ DEALBREAKERS = [
      "Video preamble. Delete it and open on the payoff."),
     (re.compile(r"(?i)^\s*(?:hey |hi |what'?s up |welcome )"),
      "Greeting. Nobody came to the feed to be greeted."),
+    (re.compile(r"(?i)^\s*(?:pare de rolar|para de rolar|não rola|nao rola|espera)\b"),
+     "Abre com \"pare de rolar\". Pedir atenção prova que você ainda não ganhou."),
+    (re.compile(r"(?i)\b(?:n[eo]ss?e (?:vídeo|video|reel)|no (?:vídeo|video|reel) de hoje"
+                r"|(?:hoje )?(?:eu )?vou (?:te |lhes? |vos )?(?:mostrar|apresentar|ensinar|contar))\b"),
+     "Preâmbulo de vídeo. Apague e abra direto no que interessa."),
+    (re.compile(r"(?i)^\s*(?:e a[íi]|eai|oi|ol[áa]|fala|salve|bom dia|boa tarde|boa noite"
+                r"|seja bem|sejam bem)\b"),
+     "Cumprimento. Ninguém abriu o feed para ser cumprimentado."),
     (HASHTAG_RE,
      "Hashtag in the hook. Hashtags belong at the bottom of the caption, if anywhere."),
     (EMOJI_RE,
@@ -201,11 +243,13 @@ def check_address(text):
     """Aimed at one viewer, or floating in the air."""
     low = text.lower()
     w = [x.lower().strip("'’") for x in words(text)]
-    if re.search(r"\b(you|your|you're|youre|yourself)\b", low):
+    if re.search(r"\b(you|your|you're|youre|yourself"
+                 r"|você|voce|vocês|voces|vc|vcs|te|teu|tua|contigo)\b", low):
         return 100.0, "speaks to the viewer"
     if w and w[0] in IMPERATIVES:
         return 90.0, f"imperative opener (\"{w[0]}\")"
-    if re.search(r"\b(i|my|me|we|our)\b", low):
+    if re.search(r"\b(i|my|me|we|our"
+                 r"|eu|meu|minha|meus|minhas|nós|nosso|nossa|a gente)\b", low):
         return 70.0, "first person, no viewer named"
     return 35.0, "third person, nobody in the room"
 

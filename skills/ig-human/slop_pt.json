@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "note": "pt-BR stock vocabulary and shapes. Read by detect.py only (merged into slop.json at load time). humanize.py does not use it, so nothing here is auto-replaced; the 'replace' field is a suggestion for a human rewrite.",
+  "words": [
+    {
+      "find": "imperdível",
+      "replace": "diga o que se perde",
+      "family": "hype"
+    },
+    {
+      "find": "imperdíveis",
+      "replace": "diga o que se perde",
+      "family": "hype"
+    },
+    {
+      "find": "paradisíaco",
+      "replace": "diga o que tem lá",
+      "family": "hype"
+    },
+    {
+      "find": "paradisíacas",
+      "replace": "diga o que tem lá",
+      "family": "hype"
+    },
+    {
+      "find": "deslumbrante",
+      "replace": "diga o que se vê",
+      "family": "hype"
+    },
+    {
+      "find": "deslumbrantes",
+      "replace": "diga o que se vê",
+      "family": "hype"
+    },
+    {
+      "find": "encantador",
+      "replace": "diga o que encanta",
+      "family": "hype"
+    },
+    {
+      "find": "espetacular",
+      "replace": "diga o fato",
+      "family": "hype"
+    },
+    {
+      "find": "espetaculares",
+      "replace": "diga o fato",
+      "family": "hype"
+    },
+    {
+      "find": "inigualável",
+      "replace": "compare com algo",
+      "family": "hype"
+    },
+    {
+      "find": "mergulhe",
+      "replace": "veja",
+      "family": "verbs"
+    },
+    {
+      "find": "desvende",
+      "replace": "veja",
+      "family": "verbs"
+    },
+    {
+      "find": "potencializar",
+      "replace": "aumentar",
+      "family": "verbs"
+    },
+    {
+      "find": "alavancar",
+      "replace": "aumentar",
+      "family": "verbs"
+    },
+    {
+      "find": "transformador",
+      "replace": "diga o que muda",
+      "family": "hype"
+    },
+    {
+      "find": "jornada",
+      "replace": "viagem / caminho",
+      "family": "nouns"
+    },
+    {
+      "find": "tapeçaria",
+      "replace": "mistura",
+      "family": "nouns"
+    },
+    {
+      "find": "crucial",
+      "replace": "importante",
+      "family": "adjectives"
+    },
+    {
+      "find": "fundamental",
+      "replace": "importante",
+      "family": "adjectives"
+    }
+  ],
+  "phrases": [
+    {
+      "find": "de tirar o fôlego",
+      "replace": "diga o que se vê",
+      "family": "tourism"
+    },
+    {
+      "find": "momentos inesquecíveis",
+      "replace": "diga o momento",
+      "family": "tourism"
+    },
+    {
+      "find": "experiência inesquecível",
+      "replace": "diga a experiência",
+      "family": "tourism"
+    },
+    {
+      "find": "experiência única",
+      "replace": "diga o que é único",
+      "family": "tourism"
+    },
+    {
+      "find": "dia inesquecível",
+      "replace": "diga o que acontece no dia",
+      "family": "tourism"
+    },
+    {
+      "find": "memórias inesquecíveis",
+      "replace": "diga a memória",
+      "family": "tourism"
+    },
+    {
+      "find": "que ficam na memória",
+      "replace": "corte",
+      "family": "tourism"
+    },
+    {
+      "find": "cenário dos sonhos",
+      "replace": "diga o cenário",
+      "family": "tourism"
+    },
+    {
+      "find": "pedacinho do paraíso",
+      "replace": "diga o lugar",
+      "family": "tourism"
+    },
+    {
+      "find": "um verdadeiro paraíso",
+      "replace": "diga o lugar",
+      "family": "tourism"
+    },
+    {
+      "find": "um verdadeiro espetáculo",
+      "replace": "diga o que acontece",
+      "family": "tourism"
+    },
+    {
+      "find": "não fiquem de fora",
+      "replace": "corte",
+      "family": "cta"
+    },
+    {
+      "find": "não perca",
+      "replace": "corte",
+      "family": "cta"
+    },
+    {
+      "find": "no mundo de hoje",
+      "replace": "hoje",
+      "family": "openers"
+    },
+    {
+      "find": "nos dias de hoje",
+      "replace": "hoje",
+      "family": "openers"
+    },
+    {
+      "find": "é importante ressaltar",
+      "replace": "corte",
+      "family": "filler"
+    },
+    {
+      "find": "vale ressaltar",
+      "replace": "corte",
+      "family": "filler"
+    },
+    {
+      "find": "vale a pena destacar",
+      "replace": "corte",
+      "family": "filler"
+    },
+    {
+      "find": "em suma",
+      "replace": "corte",
+      "family": "filler"
+    },
+    {
+      "find": "sem sombra de dúvidas",
+      "replace": "corte",
+      "family": "filler"
+    },
+    {
+      "find": "neste vídeo",
+      "replace": "corte",
+      "family": "video"
+    },
+    {
+      "find": "nesse vídeo",
+      "replace": "corte",
+      "family": "video"
+    },
+    {
+      "find": "no vídeo de hoje",
+      "replace": "corte",
+      "family": "video"
+    },
+    {
+      "find": "siga para mais",
+      "replace": "um pedido concreto",
+      "family": "follow-bait"
+    },
+    {
+      "find": "marque quem precisa ver",
+      "replace": "um pedido concreto",
+      "family": "follow-bait"
+    }
+  ],
+  "structures": [
+    {
+      "id": "nao-e-so",
+      "regex": "(?i)\\bnão é (?:só|apenas|somente) [^.!?\\n]{2,60}[,.] é\\b",
+      "name": "\"Não é só X, é Y\"",
+      "fix": "Diga a coisa que você quer dizer. Apague a metade da preparação."
+    },
+    {
+      "id": "nao-so-mas-tambem",
+      "regex": "(?i)\\bnão (?:só|apenas)\\b[^.!?\\n]{2,80}\\bmas também\\b",
+      "name": "\"Não só X, mas também Y\"",
+      "fix": "Separe em duas frases ou corte a metade mais fraca."
+    },
+    {
+      "id": "mais-do-que",
+      "regex": "(?i)(?:^|[.!?]\\s+)mais do que [^.!?\\n]{2,60}[,.] é\\b",
+      "name": "\"Mais do que X, é Y\"",
+      "fix": "Abra direto no Y."
+    },
+    {
+      "id": "imagine",
+      "regex": "(?im)^\\s*imagine\\b",
+      "name": "Abertura com \"Imagine...\" (forma escrita; \"imagina só\" falado não conta)",
+      "fix": "Mostre a cena em vez de pedir para imaginar."
+    },
+    {
+      "id": "seja-para",
+      "regex": "(?i)\\bseja (?:para|pra) [^.!?\\n]{2,50} ou (?:para|pra) \\b",
+      "name": "\"Seja para X ou para Y\"",
+      "fix": "Escolha um público."
+    }
+  ]
+}

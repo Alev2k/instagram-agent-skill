@@ -31,13 +31,37 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEX = os.path.join(HERE, "slop.json")
+# pt-BR stock terms and shapes. Merged at load time, detect.py only:
+# humanize.py never sees it, so Portuguese is flagged, never auto-rewritten.
+LEX_PT = os.path.join(HERE, "slop_pt.json")
 
 SENT_RE = re.compile(r"[^.!?\n]+[.!?]*")
-WORD_RE = re.compile(r"[A-Za-z']+")
-CONTRACTIONS = re.compile(r"\b\w+'(?:s|t|re|ve|ll|d|m)\b", re.IGNORECASE)
-PRONOUNS = re.compile(r"\b(i|me|my|mine|we|us|our|you|your)\b", re.IGNORECASE)
-NUMBERS = re.compile(r"\b\d[\d,.]*%?\b|\$\d")
-PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+# Accented letters are part of the word: "você", "não", "Jericoacoara".
+WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ']+")
+# English contractions, plus the spoken pt-BR reductions that do the same
+# job: nobody writes "para" and "está" when they are talking.
+CONTRACTIONS = re.compile(
+    r"\b\w+'(?:s|t|re|ve|ll|d|m)\b"
+    r"|\b(?:pra|pro|pras|pros|tá|tô|tava|tavam|tamo|né|cê|cês|vc|vcs|bora"
+    r"|vamo|dum|duma|num|numa|d'água)(?![\wÀ-ÿ])",
+    re.IGNORECASE)
+PRONOUNS = re.compile(
+    r"\b(i|me|my|mine|we|us|our|you|your"
+    r"|eu|meu|minha|meus|minhas|comigo|a gente|nós|nosso|nossa|nossos|nossas"
+    r"|você|vocês|te|teu|tua|contigo)(?![\wÀ-ÿ])",
+    re.IGNORECASE)
+NUMBERS = re.compile(r"\b\d[\d,.]*%?\b|R?\$\s?\d")
+PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-ZÀ-ÖØ-Þ][a-zß-öø-ÿ]{2,}\b", re.MULTILINE)
+
+
+def load_lexicon(path):
+    """slop.json, plus slop_pt.json when it sits next to this script."""
+    lex = json.load(open(path, encoding="utf-8"))
+    if os.path.exists(LEX_PT):
+        pt = json.load(open(LEX_PT, encoding="utf-8"))
+        for key in ("words", "phrases", "structures"):
+            lex[key] = lex.get(key, []) + pt.get(key, [])
+    return lex
 
 
 def clamp(n):
@@ -198,7 +222,7 @@ def main():
     ap.add_argument("--lexicon", default=LEX)
     args = ap.parse_args()
 
-    lex = json.load(open(args.lexicon, encoding="utf-8"))
+    lex = load_lexicon(args.lexicon)
     read = lambda p: sys.stdin.read() if p == "-" else open(p, encoding="utf-8").read()
 
     targets = [(args.input, read(args.input))]
