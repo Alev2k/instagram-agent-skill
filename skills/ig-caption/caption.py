@@ -35,12 +35,16 @@ HASHTAG_LIMIT = 5        # Instagram's cap per post or reel since 18 Dec 2025,
                          # rather than many generic ones, can improve both your
                          # content's performance and people's experience".
 
-HASHTAG_RE = re.compile(r"(?:^|\s)(#[A-Za-z0-9_]+)")
+# Accented letters are part of a tag: "#TurismoCeará", not "#TurismoCear".
+HASHTAG_RE = re.compile(r"(?:^|\s)(#[A-Za-z0-9_À-ÖØ-öø-ÿ]+)")
 MENTION_RE = re.compile(r"(?:^|\s)(@[A-Za-z0-9_.]+)")
-LINK_RE = re.compile(r"https?://\S+|\bwww\.\S+|\b[a-z0-9-]+\.(?:com|co|io|net|org|ai|app)/\S*",
+LINK_RE = re.compile(r"https?://\S+|\bwww\.\S+"
+                     r"|\b[a-z0-9-]+\.(?:com|co|io|net|org|ai|app)(?:\.br)?/\S*"
+                     r"|\b[a-z0-9-]+\.com\.br\b|\bwa\.me/\S*",
                      re.IGNORECASE)
 EMOJI_RE = re.compile(r"[\U0001F300-\U0001FAFF☀-➿←-⇿️]")
-CONCRETE_RE = re.compile(r"\$\s?\d|\b\d[\d,.]*\b|(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+CONCRETE_RE = re.compile(r"R?\$\s?\d|\b\d[\d,.]*\b|(?<!^)\b[A-ZÀ-ÖØ-Þ][a-zß-öø-ÿ]{2,}\b",
+                         re.MULTILINE)
 
 ASKS = [
     (re.compile(r"(?i)\bcomment (?:the word |\")?[A-Z0-9]{2,}\b"), "comment a keyword"),
@@ -51,11 +55,34 @@ ASKS = [
     (re.compile(r"(?i)\blink in (?:my )?bio\b"), "link in bio"),
     (re.compile(r"(?i)\b(?:swipe|tap) (?:through|left|right|for|to)\b"), "swipe or tap"),
     (re.compile(r"(?i)\btell me\b|\bwhat would you\b|\bwhich one\b"), "answer a question"),
+    # pt-BR. WhatsApp, direct and "link da bio" are one ask: they all mean
+    # "talk to us", and pt-BR CTAs often say them in one breath.
+    (re.compile(r"(?i)\bcomente (?:a palavra |\")?[A-Z0-9]{2,}\b|\bcomenta (?:a palavra |\")?[A-Z0-9]{2,}\b"),
+     "comentar uma palavra"),
+    (re.compile(r"(?i)\blink (?:da|na) bio\b|\b(?:chama|chame|chama a gente|fala com a gente"
+                r"|manda (?:uma )?mensagem|mande (?:uma )?mensagem)\b[^.!?\n]{0,40}"
+                r"\b(?:whatsapp|zap|direct|dm|inbox)\b|\bnos chame\b|\bme chama\b"),
+     "WhatsApp / direct / link da bio"),
+    (re.compile(r"(?i)\b(?:salva|salve) (?:esse|este|isso|o post|o vídeo|o reel|pra depois)\b"),
+     "salvar"),
+    (re.compile(r"(?i)\b(?:compartilha|compartilhe|manda (?:pra|para) (?:quem|alguém))\b"),
+     "compartilhar"),
+    (re.compile(r"(?i)\b(?:segue|siga) (?:a gente|o perfil|a @|para mais|pra mais)\b"),
+     "seguir"),
+    (re.compile(r"(?i)\b(?:marca|marque) (?:aquela|a|o|quem|alguém|um|uma|seus?|suas?)\b"),
+     "marcar alguém"),
+    (re.compile(r"(?i)\b(?:arrasta|arraste|desliza|deslize) (?:pro|para o|pra) lado\b"),
+     "arrastar"),
+    (re.compile(r"(?i)\b(?:me conta|conta pra gente|qual (?:você|vc) (?:escolhe|prefere))\b"),
+     "responder uma pergunta"),
 ]
 
 FILLER_TAGS = {"#viral", "#fyp", "#explore", "#explorepage", "#foryou", "#foryoupage",
                "#trending", "#instagood", "#love", "#follow", "#like4like", "#reels",
-               "#reelsinstagram", "#viralreels", "#instadaily"}
+               "#reelsinstagram", "#viralreels", "#instadaily",
+               # pt-BR
+               "#viralizar", "#viraliza", "#explorar", "#paravocê", "#paravoce",
+               "#segueeu", "#sigodevolta", "#sdv", "#reelsbrasil", "#brasil"}
 
 
 def visible_window(text, cut):
